@@ -9,6 +9,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct CircuitInput {
+    pub y: String,
     pub x: String, // field element, but easier to deserialize as a string
 }
 
@@ -22,16 +23,20 @@ fn some_algorithm_in_zk<F: ScalarField>(
     let ctx = builder.main(0);
 
     let x = F::from_str_vartime(&input.x).expect("deserialize field element should not fail");
+    let y = F::from_str_vartime(&input.y).expect("deserialize field element sisue");
     // `Context` can roughly be thought of as a single-threaded execution trace of a program we want to ZK prove. We do some post-processing on `Context` to optimally divide the execution trace into multiple columns in a PLONKish arithmetization
     // More advanced usage with multi-threaded witness generation is possible, but we do not explain it here
 
     // first we load a private input `x`
     let x = ctx.load_witness(x);
+    let y = ctx.load_witness(y);
+
     // make it public
     make_public.push(x);
 
     // check that `x` is in [0, 2^64)
     range.range_check(ctx, x, 64);
+    let _val = range.is_less_than(ctx, x, y, 50);
 
     // RangeChip contains GateChip so you can still do basic operations:
     let _sum = range.gate().add(ctx, x, x);
