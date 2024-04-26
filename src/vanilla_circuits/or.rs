@@ -174,7 +174,7 @@ mod test {
     fn test_or() {
         let k = 5;
         // when actually running a circuit, we specialize F to the scalar field of BN254, denoted Fr
-        let circuit = OrCircuit { a: Value::known(Fr::one()), b: Value::known(Fr::one()) };
+        let circuit = OrCircuit { a: Value::known(Fr::from(2)), b: Value::known(Fr::from(2)) };
 
         MockProver::run(k, &circuit, vec![]).unwrap().assert_satisfied();
     }
